@@ -5,6 +5,7 @@
 **[Installation Instructions](#installation-instructions)**<br>
 **[Usage](#Usage)**<br>
 **[Configuration](#Configuration)**<br>
+**[Configuration](#Demo)**<br>
 **[Support](#Support)**<br>
 **[Notes](#Notes)**<br>
 
@@ -20,6 +21,11 @@ To generating mysql import queries:<br>
 
 `excel2Mysql.exportExcelToQuery(excelFile, config, sqlFile);`
 ## Configuration
+
+## Demo
+Go to folder demo and run: `node demo.js`, a query file will be generated from mission.
+
+
 ## Support
 
 ## Notes
