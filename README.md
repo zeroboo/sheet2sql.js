@@ -18,8 +18,8 @@ Require module:<br>
 `const excel2Mysql = require("xlsx2mysql");`
 
 To generating mysql import queries:<br>
-
 `excel2Mysql.exportExcelToQuery(excelFile, config, sqlFile);`
+
 ## Configuration
 
 ## Demo
