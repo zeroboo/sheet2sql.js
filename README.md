@@ -5,7 +5,7 @@
 **[Installation Instructions](#installation-instructions)**<br>
 **[Usage](#Usage)**<br>
 **[Configuration](#Configuration)**<br>
-**[Configuration](#Demo)**<br>
+**[Demo](#Demo)**<br>
 **[Support](#Support)**<br>
 **[Notes](#Notes)**<br>
 
