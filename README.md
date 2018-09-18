@@ -1,2 +1,2 @@
-# excel2mysql
+# excel2mysql.js
 Import excel file to mysql
