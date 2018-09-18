@@ -1,10 +1,8 @@
 /***************************************************
 - [EXPORT-QUERY-START]
 - Import queries from ./mission.xlsx
-- Created time: Tue Sep 18 2018 14:33:58 GMT+0700 (SE Asia Standard Time)
+- Created time: Wed Jul 10 2019 10:21:59 GMT+0700 (Indochina Time)
 ****************************************************/
--- Truncating table `poker_mission`
-TRUNCATE TABLE `poker_mission`;
 
 ----- Insert into table poker_mission, data get from sheet Mission
 INSERT INTO `poker_mission` (`id`, `name`, `description`, `type`, `category`, `frequency`, `requirement_type`, `parameters`, `active`) VALUES (1, 'Win x time any game', 'Win in any game', 1, 0, 30, 1, NULL, true);
@@ -33,9 +31,7 @@ INSERT INTO `poker_mission` (`id`, `name`, `description`, `type`, `category`, `f
 INSERT INTO `poker_mission` (`id`, `name`, `description`, `type`, `category`, `frequency`, `requirement_type`, `parameters`, `active`) VALUES (24, 'All-in', 'All-in x time', 3, 3, 1000, 24, NULL, true);
 INSERT INTO `poker_mission` (`id`, `name`, `description`, `type`, `category`, `frequency`, `requirement_type`, `parameters`, `active`) VALUES (25, 'Win game with 3 spade', 'Win the game with 3 spade (any game mode)', 3, 4, 1000, 25, NULL, true);
 INSERT INTO `poker_mission` (`id`, `name`, `description`, `type`, `category`, `frequency`, `requirement_type`, `parameters`, `active`) VALUES (26, 'Booming', 'Booming x times (any game mode) - No need care about the game result', 3, 4, 1000, 26, NULL, true);
-INSERT INTO `poker_mission` (`id`, `name`, `description`, `type`, `category`, `frequency`, `requirement_type`, `parameters`, `active`) VALUES (27, 'Win 1st place', 'Win 1st place x times', 3, 4, 1000, 27, NULL, true);-- Truncating table `poker_mission_level`
-TRUNCATE TABLE `poker_mission_level`;
-
+INSERT INTO `poker_mission` (`id`, `name`, `description`, `type`, `category`, `frequency`, `requirement_type`, `parameters`, `active`) VALUES (27, 'Win 1st place', 'Win 1st place x times', 3, 4, 1000, 27, NULL, true);
 ----- Insert into table poker_mission_level, data get from sheet MissionLevel
 INSERT INTO `poker_mission_level` (`mission_id`, `level`, `params`, `requirement_value`, `reward_gold`) VALUES (1, 1, NULL, 5, 500);
 INSERT INTO `poker_mission_level` (`mission_id`, `level`, `params`, `requirement_value`, `reward_gold`) VALUES (2, 1, NULL, 5, 500);
@@ -108,11 +104,6 @@ INSERT INTO `poker_mission_level` (`mission_id`, `level`, `params`, `requirement
 INSERT INTO `poker_mission_level` (`mission_id`, `level`, `params`, `requirement_value`, `reward_gold`) VALUES (25, 1, NULL, 3, 500);
 INSERT INTO `poker_mission_level` (`mission_id`, `level`, `params`, `requirement_value`, `reward_gold`) VALUES (26, 1, NULL, 3, 500);
 INSERT INTO `poker_mission_level` (`mission_id`, `level`, `params`, `requirement_value`, `reward_gold`) VALUES (27, 1, NULL, 3, 500);
--- Post insert queries: 
-SELECT * FROM poker_mission_level;
-SELECT * FROM poker_mission;
-SELECT * FROM poker_mission LEFT JOIN poker_mission_level ON poker_mission.id = poker_mission_level.mission_id;
-
 /***************************************************
 - [EXPORT-QUERY-END] 
 ****************************************************/

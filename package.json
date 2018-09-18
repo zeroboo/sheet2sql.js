@@ -4,30 +4,37 @@
   "description": "Generating queries & import to mysql from xlsx files",
   "main": "src/index.js",
   "scripts": {
-    "test": "test/test.js"
+    "test": "mocha",
+    "fulltest": "nyc mocha --timeout=3000",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zeroboo/xlsx2mysql.js.git"
+    "url": "git+https://github.com/zeroboo/xlsx2sql.js.git"
   },
   "keywords": [
     "xlsx",
+    "xls",
+    "csv",
     "mysql",
-    "node",
-    "npm",
-    "query generator",
+    "postgres",
+    "sql generator",
     "sql"
   ],
   "author": "zeroboo",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/zeroboo/xlsx2mysql.js/issues"
+    "url": "https://github.com/zeroboo/xlsx2sql.js/issues"
   },
-  "homepage": "https://github.com/zeroboo/xlsx2mysql.js#readme",
+  "homepage": "https://github.com/zeroboo/xlsx2sql.js#readme",
   "dependencies": {
-    "xlsx": "^0.14.0",
-	"minimist":"^1.2.0",
-    "sprintf-js":"^1.1.1"
-
+    "sprintf-js": "^1.1.1",
+    "winston": "^3.2.1",
+    "xlsx": "^0.14.0"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.4",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1"
   }
 }

@@ -1,8 +1,6 @@
 const excel2Mysql = require("./../");
-excel2Mysql.info("xlsx2mysql!");
-
-var excelFile ="./mission.xlsx";
-var sqlFile ="./insert.sql";
+var excelFile = "./mission.xlsx";
+var sqlFile = "./insert.sql";
 var sprintf = require('sprintf-js').sprintf;
 var parseArgs = require('minimist');
 
@@ -14,40 +12,35 @@ console.log(JSON.stringify(argv));
 
 console.log("----- Reading excel:")
 var config = {
-  "sheets":{
-    "Mission":{"table_name":"poker_mission"
-      , "fields": {
-          "id":"number"
-          ,"name":"text"
-          ,"description":"text"
-          ,"type":"number"
-          ,"category":"number"
-          ,"frequency":"number"
-          , "requirement_type":"number"
-          ,	"parameters":"text"
-          , "active":"number"
-        }
-      , "truncate_table":true}
-    , "MissionLevel":{
-        "table_name":"poker_mission_level"
-        , "fields":{
-            "mission_id":"number"
-            ,"level":"number"
-            ,"params":"text"
-            , "requirement_value":"number"
-            ,	"reward_gold":"number"
+    "Mission": {
+      table_name: "poker_mission"
+      , fields: {
+        "id": "number"
+        , "name": "text"
+        , "description": "text"
+        , "type": "number"
+        , "category": "number"
+        , "frequency": "number"
+        , "requirement_type": "number"
+        , "parameters": "text"
+        , "active": "number"
       }
+      , preInsertSql:["TRUNCATE TABLE `poker_mission`;"]
+      , postInsertSql: ["SELECT * FROM `poker_mission`;"]
+      , "truncate_table": true
     }
-  },
-  "pre_insert_sql":["TRUNCATE TABLE `poker_mission`;"
-      , "TRUNCATE TABLE `poker_mission_level`;"
-    ],
-
-  "post_insert_sql":["SELECT * FROM poker_mission_level;"
-      , "SELECT * FROM poker_mission;"
-      , "SELECT * FROM poker_mission LEFT JOIN poker_mission_level ON poker_mission.id = poker_mission_level.mission_id;"
-    ]
-
+    , "MissionLevel": {
+      table_name: "poker_mission_level"
+      , fields: {
+        "mission_id": "number"
+        , "level": "number"
+        , "params": "text"
+        , "requirement_value": "number"
+        , "reward_gold": "number"
+      }
+      , preInsertSql:["TRUNCATE TABLE `poker_mission_level`;"]
+      , postInsertSql: ["SELECT * FROM `poker_mission_level`;"]
+    }
 };
 
-excel2Mysql.exportExcelToQuery(excelFile, config, sqlFile);
+excel2Mysql.exportSheetToQuery(excelFile, config, sqlFile);
