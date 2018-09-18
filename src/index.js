@@ -1,4 +1,5 @@
 function Importer(){
+
             this.sprintf = require('sprintf-js').sprintf;
 
             Importer.prototype.info = function (info) {
@@ -20,7 +21,7 @@ function Importer(){
             const FIELD_TYPE_TEXT = "text";
             const FIELD_TYPE_NUMBER = "number";
             Importer.prototype.createSQLInsertQuery = function(tableConfig, rowData){
-              this.debug("--- createSQLInsertQuery start");
+				      this.debug("--- createSQLInsertQuery start");
               this.debug("All keys = " + Object.getOwnPropertyNames(rowData));
               this.debug("Table config = " + JSON.stringify(tableConfig));
               if(Object.getOwnPropertyNames(rowData).length>0)
@@ -42,7 +43,7 @@ function Importer(){
                       return "NULL";
                     }).join(', ')
                 );
-                this.debug("--- createSQLInsertQuery: " + sqlInsert);
+                this.debug("--- createSQLInsertQuery result: " + sqlInsert);
                 return sqlInsert;
               }
               this.debug("--- createSQLInsertQuery: fail");
@@ -50,16 +51,16 @@ function Importer(){
             }
 
             Importer.prototype.exportExcelToQuery = function(filePath, insertConfig, sqlFilePath){
-              console.log('- Reading: ' + filePath);
+              this.info("exportExcelToQuery");
+              this.info('- Excel file path: ' + filePath);
+              this.info("- Inserting's config: " + JSON.stringify(insertConfig, null, 2));
               var XLSX = require('xlsx');
-              console.log("- Inserting's config: " + JSON.stringify(insertConfig));
               var workbook = XLSX.readFile(filePath);
 
               const util = require('util');
 
               var fs = require('fs');
-              var allInsertQueries = Array();
-
+              var allInsertQueries = [];
 
               var sqlDesc = '/***************************************************\n'
                 + '- [EXPORT-QUERY-START]\n'
@@ -68,6 +69,18 @@ function Importer(){
                 + '****************************************************/\n';
 
               allInsertQueries.push(sqlDesc);
+              var extraSql = insertConfig['pre_insert_sql'];
+              if(extraSql != undefined)
+              {
+                this.info("Printing pre_insert_sql: " + Object.getOwnPropertyNames(extraSql).length);
+                allInsertQueries.push('\n----- Pre-insert queries: \n');
+                for(var index in extraSql){
+                    allInsertQueries.push(extraSql[index] + "\n");
+                    this.debug("Extra sql: " + extraSql[index]);
+                }
+              }
+
+
               var sheetConfig = insertConfig['sheets'];
               this.info(this.sprintf("Sheets config: %s", JSON.stringify(sheetConfig)));
               workbook.SheetNames.forEach(sheetName => {
@@ -84,13 +97,13 @@ function Importer(){
 
                   this.info(this.sprintf("Parsing sheet %s, total rows %d", sheetName, sheetJSON.length));
 
-                  if(tableConfig['truncate_table'] === true)
-                  {
-                      var sqlTruncate = '-- Truncating table `' + tableConfig.table_name+ '`\n'
-                        +'TRUNCATE TABLE `' + tableConfig.table_name + '`;\n';
-
-                      allInsertQueries.push(sqlTruncate);
-                  }
+                  // if(tableConfig['truncate_table'] === true)
+                  // {
+                  //     var sqlTruncate = '-- Truncating table `' + tableConfig.table_name+ '`\n'
+                  //       +'TRUNCATE TABLE `' + tableConfig.table_name + '`;\n';
+                  //
+                  //     allInsertQueries.push(sqlTruncate);
+                  // }
                   if(sheetJSON.length > 0)
                   {
                       ///Read headers
@@ -114,23 +127,21 @@ function Importer(){
                         }
                       }
                   }
-
                 }
                 else {
                   console.log("\tSheet has no config, bypass it!");
                 }
-
               });
+
               var extraSql = insertConfig['post_insert_sql'];
               if(extraSql != undefined)
               {
                 this.info("Printing post_insert_sql: " + Object.getOwnPropertyNames(extraSql).length);
-                allInsertQueries.push('\n-- Post insert queries: \n');
+                allInsertQueries.push('\n----- Post-insert queries: \n');
                 for(var index in extraSql){
                     allInsertQueries.push(extraSql[index] + "\n");
                     this.debug("Extra sql: " + extraSql[index]);
                 }
-
               }
 
               allInsertQueries.push('\n/***************************************************\n');
