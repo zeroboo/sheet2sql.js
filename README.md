@@ -23,7 +23,7 @@ To generating mysql import queries:<br>
 ## Configuration
 
 ## Demo
-Go to folder demo and run: `node demo.js`, a query file will be generated from mission.
+Go to folder demo and run: `node demo.js`, a query file will be generated from mission.xlsx.
 
 
 ## Support
