@@ -120,9 +120,6 @@ describe("TestGenerateSQLInsert", function(){
             sql += line + "\n";
         }
         console.debug("sql: \n", sql);
-        
-
-
         assert.equal(
             ["-- Hello World"
             , 'INSERT INTO game.mission("id","name","description","type","category","frequency","requirement_type","parameters","active","level required") VALUES '
