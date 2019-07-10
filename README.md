@@ -1,4 +1,4 @@
-# excel2mysql.js
+# sheet2sql.js
 A node module for generating queries & importing to mysql from excel files
 
 ## Table of Contents
