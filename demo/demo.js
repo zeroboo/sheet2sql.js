@@ -1,7 +1,6 @@
 const excel2Mysql = require("./../");
 var excelFile = "./mission.xlsx";
 var sqlFile = "./insert.sql";
-var sprintf = require('sprintf-js').sprintf;
 var parseArgs = require('minimist');
 
 console.log("----- Parameters:")
@@ -13,34 +12,35 @@ console.log(JSON.stringify(argv));
 console.log("----- Reading excel:")
 var config = {
     "Mission": {
-      table_name: "poker_mission"
-      , fields: {
-        "id": "number"
-        , "name": "text"
-        , "description": "text"
-        , "type": "number"
-        , "category": "number"
-        , "frequency": "number"
-        , "requirement_type": "number"
-        , "parameters": "text"
-        , "active": "number"
+      schema: "game",
+      table: "poker_mission",
+      fields: {
+        "id": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'id'},
+        "name": {type: excel2Mysql.DATA_TYPE_TEXT, sqlField:'name'},
+        "description": {type: excel2Mysql.DATA_TYPE_TEXT, sqlField:'description'},
+        "type": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'type'},
+        "category": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'category'},
+        "frequency": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'frequency'},
+        "requirement_type": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'requirement_type'},
+        "parameters": {type: excel2Mysql.DATA_TYPE_TEXT, sqlField:'parameters'},
+        "active": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'active'}
       }
       , preInsertSql:["TRUNCATE TABLE `poker_mission`;"]
       , postInsertSql: ["SELECT * FROM `poker_mission`;"]
-      , "truncate_table": true
-    }
-    , "MissionLevel": {
-      table_name: "poker_mission_level"
-      , fields: {
-        "mission_id": "number"
-        , "level": "number"
-        , "params": "text"
-        , "requirement_value": "number"
-        , "reward_gold": "number"
-      }
-      , preInsertSql:["TRUNCATE TABLE `poker_mission_level`;"]
-      , postInsertSql: ["SELECT * FROM `poker_mission_level`;"]
+    },
+    "MissionLevel": {
+      schema: "game",
+      table: "poker_mission_level",
+      fields: {
+        "mission_id": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'mission_id'},
+        "level": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'level'},
+        "params": {type: excel2Mysql.DATA_TYPE_TEXT, sqlField:'params'},
+        "requirement_value": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'requirement_value'},
+        "reward_gold": {type: excel2Mysql.DATA_TYPE_NUMBER, sqlField:'reward_gold'}
+      },
+      preInsertSql:["TRUNCATE TABLE `poker_mission_level`;"],
+      postInsertSql: ["SELECT * FROM `poker_mission_level`;"]
     }
 };
 
-excel2Mysql.exportSheetToQuery(excelFile, config, sqlFile);
+excel2Mysql.export("postgres", excelFile, config, "./");

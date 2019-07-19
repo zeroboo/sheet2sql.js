@@ -1,6 +1,6 @@
 const SqlGenerator = require("./SqlGenerator");
 const util = require('util');
-
+const escape = require('pg-escape');
 const DATA_TYPE_TEXT = require('./SqlFieldConfig').DATA_TYPE_TEXT;
 const DATA_TYPE_NUMBER = require('./SqlFieldConfig').DATA_TYPE_NUMBER;
 const DATA_TYPE_BOOLEAN = require('./SqlFieldConfig').DATA_TYPE_BOOLEAN;
@@ -18,34 +18,42 @@ class PostgresSqlGenerator extends SqlGenerator {
 
   generateInsertIntoPhrase(schemaName, tableName, columnNames)
   {
+    ///console.debug("generateInsertIntoPhrase", schemaName, tableName, columnNames);
     if(schemaName && schemaName.length >0)
     {
       return util.format("INSERT INTO %s.%s(%s) VALUES "
-      , schemaName
-      , tableName
+      , escape.ident(schemaName)
+      , escape.ident(tableName)
       , columnNames.map(function(value, index, array){
-        ///console.log("val", value);
           return this.quoteFieldNameInInsertQuery(value);
         }.bind(this))
-        .join(',')
+        .join(', ')
       );
     }
     else{
       return util.format("INSERT INTO %s(%s) VALUES "
-      , tableName
+      , escape.ident(tableName)
       , columnNames.map(function(value, index, array){
-        ///console.log("val", value);
           return this.quoteFieldNameInInsertQuery(value);
         }.bind(this))
-        .join(',')
+        .join(', ')
       );
     }
     
   }
-
+  generateFieldValue(value, valueType)
+  {
+    if(value==null || value==undefined)
+    {
+      return 'NULL';
+    }
+    else{
+      return escape("%L", value.toString());
+    }
+  }
   quoteFieldNameInInsertQuery(fieldName)
   {
-    return util.format('"%s"', fieldName);
+    return escape("%I", fieldName);
   }
 
 }

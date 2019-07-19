@@ -1,18 +1,29 @@
 const util = require('util');
-const FIELD_TYPE_TEXT = "text";
-const FIELD_TYPE_NUMBER = "number";
+const DATA_TYPE_TEXT = require('./../src/SqlFieldConfig').DATA_TYPE_TEXT;
+const DATA_TYPE_NUMBER = require('./../src/SqlFieldConfig').DATA_TYPE_NUMBER;
+const DATA_TYPE_BOOLEAN = require('./../src/SqlFieldConfig').DATA_TYPE_BOOLEAN;
+
 const winston = require('winston');
 const XLSX = require('xlsx');
 const SheetReader = require('./SheetReader');
-class Importer{
+const PostgresSqlGenerator = require('./PostgresSqlGenerator');
+const SqlWriter = require('./SqlWriter');
+var fs = require('fs');
+
+const supportedDialect = ['postgres'];
+
+class Exporter{
   constructor(){
+    this.DATA_TYPE_TEXT = DATA_TYPE_TEXT;
+    this.DATA_TYPE_NUMBER = DATA_TYPE_NUMBER;
+    this.DATA_TYPE_BOOLEAN = DATA_TYPE_BOOLEAN;
+    
     this.logger = winston.createLogger({
         level: 'info',
         format: winston.format.simple(),
         ///defaultMeta: { service: 'user-service' },
         transports: [
-            //new winston.transports.File({ filename: 'error.log', level: 'error' }),
-            //new winston.transports.File({ filename: 'combined.log' })
+            new winston.transports.File({ filename: 'log.log' }),
             new winston.transports.Console({
                 format: winston.format.simple()
             })
@@ -38,10 +49,10 @@ class Importer{
         , Object.keys(tableConfig['fields']).map(function(key, index){
             if(rowData[key] != undefined && rowData[key] !== "NULL")
             {
-                if(tableConfig['fields'][key].toLowerCase() == FIELD_TYPE_TEXT) {
+                if(tableConfig['fields'][key].toLowerCase() == DATA_TYPE_TEXT) {
                     return "'" + rowData[key] + "'";
                   }
-                else if(tableConfig['fields'][key].toLowerCase() == FIELD_TYPE_NUMBER){
+                else if(tableConfig['fields'][key].toLowerCase() == DATA_TYPE_NUMBER){
                     return rowData[key];
                   }
             }
@@ -166,9 +177,39 @@ class Importer{
 
     }.bind(this));
   }
+
+  export(sqlDialect, sheetFilePath, sqlConfig, sqlFolderPath){
+    this.logInfo("---Sheet2Sql exporter: ");
+    this.logInfo('- Sheet path: ' + sheetFilePath);
+    this.logInfo('- SQL path: ' + sqlFolderPath);
+    this.logInfo('- SQL dialect: ' + sqlDialect);
+    this.logInfo("- Config: " + JSON.stringify(sqlConfig, null, 2));
+
+    var reader = new SheetReader();
+    reader.readFile(sheetFilePath);
+    
+    if (!fs.existsSync(sqlFolderPath)){
+        fs.mkdirSync(sqlFolderPath);
+    }
+
+    Object.keys(sqlConfig).forEach(function (sheet) {
+      this.logInfo("Exporting sheet: ", sheet, sqlConfig[sheet]);
+      let rows = reader.readRows(sheet, sqlConfig[sheet]);
+
+      let generator = new PostgresSqlGenerator(sqlConfig[sheet]);
+      generator.generateInsertQuery(rows);
+      
+      let sqlWriter = new SqlWriter();
+      sqlWriter.writeFile(sqlFolderPath + "/" + sheet + "." +sqlDialect + ".sql", generator);
+      
+    }.bind(this));
+    
+  }
+  
 }
-            
+
+
             
 
             
-module.exports = new Importer();
+module.exports = new Exporter();

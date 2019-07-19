@@ -4,6 +4,12 @@ const util = require('util');
 const DATA_TYPE_TEXT = require('./SqlFieldConfig').DATA_TYPE_TEXT;
 const DATA_TYPE_NUMBER = require('./SqlFieldConfig').DATA_TYPE_NUMBER;
 const DATA_TYPE_BOOLEAN = require('./SqlFieldConfig').DATA_TYPE_BOOLEAN;
+
+const STEP_PRE_INSERT = 0;
+const STEP_INSERT_PHRASE = 1;
+const STEP_INSERT_VALUES = 2;
+const STEP_POST_INSERT = 3;
+
 class SqlGenerator{
     constructor(config){
         this.logger = winston.createLogger({
@@ -21,7 +27,7 @@ class SqlGenerator{
         this.config = config;
         this.resetGeneratingInsertQuery();
         this.dataRows = null;
-        this.logInfo("SqlGenerator: config", JSON.stringify(config));
+        this.logInfo("SqlGenerator: config", (config));
     }
     logInfo(... objects)
     {
@@ -36,91 +42,102 @@ class SqlGenerator{
       
       return {
         next: function(){
-          let complete = true;
+          let complete = false;
           let value = null;
           ///Pre sql
-          if (complete && this.config.preInsertSql) {
-            if (this.generatePreQueryCount < this.config.preInsertSql.length) {
-              value = this.config.preInsertSql[this.generatePreQueryCount];
-              this.generatePreQueryCount++;
-              complete = false;
-            }
-          }
-          
-          ///INSERT INTO
-          if (this.dataRows && this.dataRows.length > 0) {
-            if (complete && !this.generateQueryPhraseInsertInto) {
-              this.generateQueryPhraseInsertInto = true;
-              let dataFields = Object.keys(this.config.fields).filter(function (key, index, arr) {
-                ///console.log("Filtering key :", key, this.config.fields[key]);
-                return this.config.fields[key].sqlField.length > 0;
+          while(value ==null && !complete){
+
+            if(this.generateStep == STEP_PRE_INSERT)
+            {
+              if (this.config.preInsertSql) {
+                if (this.generatePreQueryCount < this.config.preInsertSql.length) {
+                  value = this.config.preInsertSql[this.generatePreQueryCount];
+                  this.generatePreQueryCount++;
                 }
-                , this
-              );
-              value = this.generateInsertIntoPhrase(this.config.schema, this.config.table, dataFields)
-              console.log("hahaha", dataFields);
-              complete = false;
-            }
-  
-            if (complete && this.dataRows) {
-              if (this.generateQueryPhraseValueCount < this.dataRows.length) {
-                
-                let fieldValues = Object.keys(this.config.fields)
-                  .filter(function (key, index, arr) {
-                    return this.config.fields[key].sqlField.length > 0;
-                    }
-                    , this
-                  )
-                  .map(function (key, index, arr) {
-                      ///console.log("MapValueKey: ", key, this.generateQueryPhraseValueCount, this.config.fields[key]);
-                      if (this.config.fields[key].sqlFieldValue && this.config.fields[key].sqlFieldValue.length > 0) {
-                        return util.format(this.config.fields[key].sqlFieldValue, this.dataRows[this.generateQueryPhraseValueCount][key]);
-                      }
-                      else{
-                        if (this.config.fields[key].type == DATA_TYPE_TEXT) {
-                          return "'" + this.dataRows[this.generateQueryPhraseValueCount][key] + "'";
-                        }
-                        else {
-                          return this.dataRows[this.generateQueryPhraseValueCount][key];
-                        }
-                      }
-                      }
-                    , this
-                  ).join(',');
-  
-                value = util.format("(%s)%s"
-                  , fieldValues
-                  , (this.generateQueryPhraseValueCount == this.dataRows.length - 1)
-                    ? ";"
-                    : ","
-                );
-                this.generateQueryPhraseValueCount++;
-                complete = false;
+                else{
+                  this.generateStep++;
+                }
+              }
+              else{
+                this.generateStep++;
               }
             }
-          }
-          else {
-            this.generateQueryPhraseInsertInto = true;
-          }
-  
-          ///Post sql
-          if (complete && this.config.postInsertSql) {
-            if (this.generatePostQueryCount < this.config.postInsertSql.length) {
-              value = this.config.postInsertSql[this.generatePostQueryCount];
-              this.generatePostQueryCount++;
-              complete = false;
+            else if(this.generateStep == STEP_INSERT_PHRASE)
+            {
+              if (this.dataRows && this.dataRows.length > 0) {
+                let dataFields = Object.keys(this.config.fields).filter(function (key, index, arr) {
+                    ///console.log("Filtering key :", key, this.config.fields[key]);
+                    return this.config.fields[key].sqlField.length > 0;
+                  }
+                  , this
+                );
+                value = this.generateInsertIntoPhrase(this.config.schema, this.config.table, dataFields)
+                this.generateStep++;
+              } else{
+                this.generateStep++;
+              }
+              
+            }
+            else if(this.generateStep == STEP_INSERT_VALUES)
+            {
+              if (this.dataRows) {
+                if (this.generateQueryPhraseValueCount < this.dataRows.length) {
+                  let fieldValues = Object.keys(this.config.fields)
+                    .filter(function (key, index, arr) {
+                      return this.config.fields[key].sqlField.length > 0;
+                      }
+                      , this
+                    )
+                    .map(function (key, index, arr) {
+                        this.logDebug("MapValueKey: ", key, this.generateQueryPhraseValueCount, this.config.fields[key]);
+                        if (this.config.fields[key].sqlFieldValue && this.config.fields[key].sqlFieldValue.length > 0) {
+                          ///Field value is a subquery
+                          return util.format(this.config.fields[key].sqlFieldValue, this.dataRows[this.generateQueryPhraseValueCount][key]);
+                        } else{
+                          return this.generateFieldValue(this.dataRows[this.generateQueryPhraseValueCount][key], this.config.fields[key].type);
+                        }
+                      }
+                      , this
+                    ).join(', ');
+    
+                  value = util.format("(%s)%s"
+                    , fieldValues
+                    , (this.generateQueryPhraseValueCount == this.dataRows.length - 1)
+                      ? ";"
+                      : ","
+                  );
+                  this.generateQueryPhraseValueCount++;
+                }
+                else{
+                  this.generateStep++;
+                }
+              } else {
+                this.generateStep++;
+              }
+            }
+            else if (this.generateStep == STEP_POST_INSERT)
+            {
+                ///Post sql
+                if (this.config.postInsertSql) {
+                  if (this.generatePostQueryCount < this.config.postInsertSql.length) {
+                    value = this.config.postInsertSql[this.generatePostQueryCount];
+                    this.generatePostQueryCount++;
+                  }
+                  else{
+                    complete = true;  
+                  }
+                }
+                else{
+                  complete = true;
+                }
             }
           }
-  
-          if (complete) {
-            return { done: true };
-          }
-          else {
-            return { value: value, done: false };
-          }
+          ///console.log("Generating: ", value, complete, this.generateStep)
+          return { value: value, done: complete };
         }.bind(this)
       };
     }
+
     quoteFieldNameInInsertQuery(fieldName)
     {
       return '"' + fieldName + '"';
@@ -128,7 +145,7 @@ class SqlGenerator{
     
     generateInsertQuery(dataRows) {
       this.dataRows = dataRows;
-      this.logInfo("SqlGenerator.generateInsertQuery: ", "config=", JSON.stringify(this.config), ", dataRows=", this.dataRows.length);
+      ///this.logInfo("SqlGenerator.generateInsertQuery: ", "config=", JSON.stringify(this.config), ", dataRows=", this.dataRows.length);
     }
 
     generateInsertIntoPhrase(schemaName, tableName, columnNames)
@@ -136,12 +153,22 @@ class SqlGenerator{
         return "";
     }
 
+    generateFieldValue(value, valueType)
+    {
+      if (valueType == DATA_TYPE_TEXT) {
+        return "'" + value + "'";
+      }
+      else {
+        return value;
+      }
+    }
     resetGeneratingInsertQuery()
     {
       this.generatePreQueryCount = 0;
-      this.generateQueryPhraseInsertInto = false;
       this.generateQueryPhraseValueCount = 0;
       this.generatePostQueryCount = 0;
+      this.generateStep = 0;
+
     }
 
 

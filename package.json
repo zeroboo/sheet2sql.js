@@ -1,7 +1,7 @@
 {
-  "name": "xlsx2mysql",
-  "version": "1.0.0",
-  "description": "Generating queries & import to mysql from xlsx files",
+  "name": "sheet2sql",
+  "version": "0.0.1",
+  "description": "Generating sql import queries from sheet files",
   "main": "src/index.js",
   "scripts": {
     "test": "mocha",
@@ -19,7 +19,7 @@
     "mysql",
     "postgres",
     "sql generator",
-    "sql"
+    "sql","sheet"
   ],
   "author": "zeroboo",
   "license": "ISC",
@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/zeroboo/xlsx2sql.js#readme",
   "dependencies": {
-    "sprintf-js": "^1.1.1",
+    "pg-escape": "^0.2.0",
     "winston": "^3.2.1",
     "xlsx": "^0.14.0"
   },

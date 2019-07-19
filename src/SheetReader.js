@@ -71,7 +71,7 @@ class SheetReader {
                     this.logInfo("SheetReader.rows: ", sheetJSON.length);
 
                     sheetJSON.forEach(function (row, rowIndex, sheetRows) {
-                        this.logInfo("FieldJson: ", row);
+                        this.logDebug("FieldJson: ", row);
                         let selectedRow = (!sqlConfig.startRow && !sqlConfig.endRow)
                             || (sqlConfig.startRow && rowIndex >= sqlConfig.startRow)
                             || (sqlConfig.endRow && rowIndex <= sqlConfig.endRow);
