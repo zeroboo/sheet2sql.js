@@ -1,5 +1,5 @@
 # sheet2sql.js
-A node module for generating queries & importing to mysql from excel files
+A node module for generating sql from sheet document (xls, xslx, csv...)
 
 ## Table of Contents
 **[Installation Instructions](#installation-instructions)**<br>
@@ -12,10 +12,10 @@ A node module for generating queries & importing to mysql from excel files
 
 
 ## Installation-instructions
-From npm: `npm install xlsx2mysql`
+From npm: `npm install sheet2sql`
 ## Usage
 Require module:<br>
-`const excel2Mysql = require("xlsx2mysql");`
+`const sheet2Sql = require("sheet2sql");`
 
 To generating mysql import queries:<br>
 `excel2Mysql.exportSheetToQuery(excelFile, config, sqlFile);`
@@ -23,7 +23,15 @@ To generating mysql import queries:<br>
 ## Configuration
 
 ## Demo
-Go to folder demo and run: `node demo.js`, a query file will be generated from mission.xlsx.
+From root folder, go to demo folder
+`cd demo`
+Run demo script
+`node demo.js`
+Query file will be generated from mission.xlsx
+Scripts will be generated under sub folder
+`demo-with-config`: run exporter with a configuration
+`demo-no-config`: run exporter with default configuration
+
 
 
 ## Support
