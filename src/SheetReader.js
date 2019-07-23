@@ -13,8 +13,8 @@ class SheetReader {
             format: winston.format.simple(),
             ///defaultMeta: { service: 'user-service' },
             transports: [
-                //new winston.transports.File({ filename: 'error.log', level: 'error' }),
-                //new winston.transports.File({ filename: 'combined.log' })
+                new winston.transports.File({ filename: 'error.log', level: 'error' }),
+                new winston.transports.File({ filename: 'log.log' }),
                 new winston.transports.Console({
                     format: winston.format.simple()
                 })
@@ -52,13 +52,31 @@ class SheetReader {
     getSheetnames() {
         return this.sheetNames;
     }
+    getColumns(sheetName)
+    {
+        let result = [];
+        var sheet = this.workbook.Sheets[sheetName];
+        var sheetJSON = XLSX.utils.sheet_to_json(sheet, { raw: true });
+        if(sheetJSON.length > 0)
+        {
+            let sampleRow = sheetJSON[0];
+            Object.keys(sampleRow).forEach(
+                function(key){
+                    result.push(key);
+                }.bind(this));
+        }
+        
+        return result;
+    }
     /**
      * 
      * @param {*} sheetName 
      * @param {*} sqlConfig Table config, @see RowConfig
      */
     readRows(sheetName, sqlConfig) {
-        this.logInfo("SheetReader.readRows: sheetName=", sheetName, ", config=", sqlConfig, ", filter=", sqlConfig?sqlConfig.filter:"noFilter");
+        this.logInfo("SheetReader.readRows: sheetName=", sheetName, 
+            ", config=", sqlConfig,
+             ", filter=", sqlConfig?sqlConfig.filter:"noFilter");
         var sheet = this.workbook.Sheets[sheetName];
 
         
@@ -69,6 +87,7 @@ class SheetReader {
                 var sheetJSON = XLSX.utils.sheet_to_json(sheet, { raw: true });
                 if (sheetJSON) {
                     this.logInfo("SheetReader.rows: ", sheetJSON.length);
+                    ///this.logInfo("SheetReader.rows: ", sheetJSON);
 
                     sheetJSON.forEach(function (row, rowIndex, sheetRows) {
                         this.logDebug("FieldJson: ", row);
@@ -101,6 +120,8 @@ class SheetReader {
                 else {
                     throw new Error("Parsing sheet error: " + sheetName);
                 }
+            } else {
+                throw new Error("Invalid sql config: " + sqlConfig);    
             }
         }
         else {

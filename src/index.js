@@ -19,7 +19,7 @@ class Exporter{
     this.DATA_TYPE_BOOLEAN = DATA_TYPE_BOOLEAN;
     
     this.logger = winston.createLogger({
-        level: 'info',
+        level: 'debug',
         format: winston.format.simple(),
         ///defaultMeta: { service: 'user-service' },
         transports: [
@@ -177,19 +177,45 @@ class Exporter{
 
     }.bind(this));
   }
+  createDefaultConfig(sheetName, sheetColumns){
+    this.logInfo("createDefaultConfig", sheetName, sheetColumns.length);
+    let config = {};
+    this.logInfo("Columns found:", sheetColumns.length);
+    config["fields"] = {};
+    sheetColumns.forEach(function(field){
+        config.fields[field] = {type: DATA_TYPE_TEXT, sqlField:field};
+    }.bind(this));
 
+    config["schema"] = "";
+    config["table"] = sheetName;
+    return config;
+  }
   export(sqlDialect, sheetFilePath, sqlConfig, sqlFolderPath){
-    this.logInfo("---Sheet2Sql exporter: ");
+    this.logInfo("Sheet2Sql.export");
     this.logInfo('- Sheet path: ' + sheetFilePath);
     this.logInfo('- SQL path: ' + sqlFolderPath);
     this.logInfo('- SQL dialect: ' + sqlDialect);
-    this.logInfo("- Config: " + JSON.stringify(sqlConfig, null, 2));
+    this.logInfo("- Config:", JSON.stringify(sqlConfig, null, 2));
+    this.logInfo("- Config:", sqlConfig);
 
     var reader = new SheetReader();
     reader.readFile(sheetFilePath);
     
     if (!fs.existsSync(sqlFolderPath)){
         fs.mkdirSync(sqlFolderPath);
+    }
+    
+    ///No config given => parse all sheet
+    if(sqlConfig == null || Object.keys(sqlConfig).length == 0) {
+        this.logInfo("NoConfig given, generating default config: ", reader.getSheetnames());
+        for(let sheetIndex in reader.getSheetnames()){
+          let sheetName = reader.getSheetnames()[sheetIndex];
+          let sheetColumns = reader.getColumns(sheetName);
+          
+          sqlConfig[sheetName] = this.createDefaultConfig(sheetName, sheetColumns);
+          
+        }
+        this.logInfo("Generating default config: ", Object.keys(sqlConfig).length);
     }
 
     Object.keys(sqlConfig).forEach(function (sheet) {
