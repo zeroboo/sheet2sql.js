@@ -6,4 +6,4 @@ var sqlFile = "./insert.sql";
 console.log("----- Parameters:")
 var config={}
 
-excel2Mysql.export("postgres", sheetFile, config, "./");
+excel2Mysql.exportInsert("postgres", sheetFile, config, "./");

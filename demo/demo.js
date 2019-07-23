@@ -43,4 +43,5 @@ var config = {
     }
 };
 
-excel2Mysql.export("postgres", excelFile, config, "./");
+excel2Mysql.export("postgres", excelFile, config, "./demo-with-config");
+excel2Mysql.export("postgres", excelFile, config, "./demo-no-config");
