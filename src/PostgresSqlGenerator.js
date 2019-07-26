@@ -25,6 +25,7 @@ class PostgresSqlGenerator extends SqlGenerator {
       , escape.ident(schemaName)
       , escape.ident(tableName)
       , columnNames.map(function(value, index, array){
+          ///console.log(value);
           return this.quoteFieldNameInInsertQuery(value);
         }.bind(this))
         .join(', ')

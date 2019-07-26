@@ -190,7 +190,9 @@ class Exporter{
     config["table"] = sheetName;
     return config;
   }
-  export(sqlDialect, sheetFilePath, sqlConfig, sqlFolderPath){
+  
+  
+  exportInsert(sqlDialect, sheetFilePath, sqlConfig, sqlFolderPath){
     this.logInfo("Sheet2Sql.export");
     this.logInfo('- Sheet path: ' + sheetFilePath);
     this.logInfo('- SQL path: ' + sqlFolderPath);

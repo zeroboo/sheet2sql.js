@@ -65,12 +65,15 @@ class SqlGenerator{
             else if(this.generateStep == STEP_INSERT_PHRASE)
             {
               if (this.dataRows && this.dataRows.length > 0) {
-                let dataFields = Object.keys(this.config.fields).filter(function (key, index, arr) {
+                let dataFields = Object.keys(this.config.fields)
+                .filter(function (key, index, arr) {
                     ///console.log("Filtering key :", key, this.config.fields[key]);
                     return this.config.fields[key].sqlField.length > 0;
                   }
                   , this
-                );
+                ).map(function(key){
+                    return this.config.fields[key].sqlField;
+                }, this);
                 value = this.generateInsertIntoPhrase(this.config.schema, this.config.table, dataFields)
                 this.generateStep++;
               } else{
