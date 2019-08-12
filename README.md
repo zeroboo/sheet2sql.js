@@ -36,15 +36,15 @@ SheetConfig
 
 
 ## Demo
->From root folder, go to demo folder<br>
-`cd demo`<br>
->Run demo script<br>
-`node demo.js`<br>
->Query file will be generated from demo/mission.xlsx<br>
+From root folder, go to demo folder<br>
+```cd demo```
+Run demo script<br>
+```node demo.js```
+Query file will be generated from demo/mission.xlsx<br>
 
->Scripts will be generated under sub folder<br>
-`demo-with-config`: run exporter with a configuration<br>
-`demo-no-config`: run exporter with default configuration<br>
+Scripts will be generated under sub folder<br>
+```demo-with-config```: run exporter with a configuration<br>
+```demo-no-config```: run exporter with default configuration<br>
 
 
 
