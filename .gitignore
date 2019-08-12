@@ -90,3 +90,5 @@ typings/
 
 exportBSS*.js
 *.sql
+
+.vscode/

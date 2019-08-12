@@ -19,7 +19,8 @@
     "mysql",
     "postgres",
     "sql generator",
-    "sql","sheet"
+    "sql",
+    "sheet"
   ],
   "author": "zeroboo",
   "license": "ISC",

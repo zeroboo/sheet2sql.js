@@ -21,7 +21,7 @@ describe("TestReadExcel", function(){
                     , unreal: {type: DATA_TYPE_BOOLEAN}
                 }
                 , filter: function(row){
-                    console.log("Filtering", row);
+                    ///console.log("Filtering", row);
                     return row.description.indexOf("Win")>-1;
                 }
         };
