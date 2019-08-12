@@ -24,6 +24,16 @@ To generating mysql insert queries:<br>
 * `config`: exporting config, `null` to use default config
 * `outputFolder` Folder for generated SQL queries
 ## Configuration
+Config object has fields that map a sheet name to this sheet parsing config.
+{
+    "Sheet1": {} 
+}
+
+SheetConfig 
+{
+
+}
+
 
 ## Demo
 >From root folder, go to demo folder<br>
