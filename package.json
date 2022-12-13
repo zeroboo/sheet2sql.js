@@ -31,7 +31,7 @@
   "dependencies": {
     "pg-escape": "^0.2.0",
     "winston": "^3.2.1",
-    "xlsx": "^0.14.0"
+    "xlsx": "^0.17.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.4",
